@@ -11,13 +11,13 @@ export class User {
    @Column({ type: "text", unique: true })
    login: string
 
-   @Column({ type: "text" })
+   @Column({ type: "text", nullable: true })
    firstName: string
 
-   @Column({ type: "text" })
+   @Column({ type: "text", nullable: true })
    lastName: string
 
-   @Column({ type: "text" })
+   @Column({ type: "text", nullable: true })
    patronymic: string
 
    @Column({ type: "text" })
@@ -26,10 +26,10 @@ export class User {
    @Column({ type: "text" })
    salt: string
 
-   @Column({ type: "text", unique: true })
+   @Column({ type: "text", unique: true, nullable: true })
    email: string
 
-   @Column({ type: "text" })
+   @Column({ type: "text", nullable: true })
    phone: string
 
    @Column({ type: "enum", enum: ["applicant", "manager", "employer"] })

@@ -5,6 +5,7 @@ import { ConfigModule } from "@nestjs/config"
 import { ManagerModule } from "./manager/manager.module"
 import { ApplicantModule } from "./applicant/applicant.module"
 import { EmployerModule } from "./employer/employer.module"
+import { AuthModule } from './auth/auth.module';
 
 @Module({
    imports: [
@@ -14,6 +15,7 @@ import { EmployerModule } from "./employer/employer.module"
       ManagerModule,
       ApplicantModule,
       EmployerModule,
+      AuthModule,
    ],
    controllers: [],
    providers: [],
