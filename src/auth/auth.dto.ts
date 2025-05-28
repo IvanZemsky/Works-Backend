@@ -11,3 +11,16 @@ export class SignUpDTO {
    @IsEnum(["applicant", "manager", "employer"])
    role: UserRole
 }
+
+export class SignInDTO {
+   @IsNotEmpty()
+   login: string
+
+   @IsNotEmpty()
+   password: string
+}
+
+export type TokensDTO = {
+   accessToken: string
+   refreshToken: string
+}

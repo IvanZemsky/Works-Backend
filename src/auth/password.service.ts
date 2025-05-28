@@ -1,4 +1,4 @@
-import * as bcryptjs from 'bcryptjs'
+import * as bcryptjs from "bcryptjs"
 
 export class PasswordService {
    getSalt() {

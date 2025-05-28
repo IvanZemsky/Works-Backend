@@ -1,5 +1,7 @@
 import { IsEnum, IsNotEmpty } from "class-validator"
-import { UserRole } from "./user.model"
+import { User, UserRole } from "./user.model"
+
+export type GetUserDTO = Omit<User, "passwordHash" | "salt">
 
 export class CreateUserDTO {
    @IsNotEmpty()

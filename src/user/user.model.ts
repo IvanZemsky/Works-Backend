@@ -12,13 +12,13 @@ export class User {
    login: string
 
    @Column({ type: "text", nullable: true })
-   firstName: string
+   firstName: string | null
 
    @Column({ type: "text", nullable: true })
-   lastName: string
+   lastName: string | null
 
    @Column({ type: "text", nullable: true })
-   patronymic: string
+   patronymic: string | null
 
    @Column({ type: "text" })
    passwordHash: string
@@ -27,11 +27,14 @@ export class User {
    salt: string
 
    @Column({ type: "text", unique: true, nullable: true })
-   email: string
+   email: string | null
 
    @Column({ type: "text", nullable: true })
-   phone: string
+   phone: string | null
 
    @Column({ type: "enum", enum: ["applicant", "manager", "employer"] })
    role: UserRole
+
+   @Column({ type: "text", nullable: true })
+   refreshToken: string | null
 }

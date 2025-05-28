@@ -1,33 +1,18 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
-import { CreateUserDTO } from "src/user/user.dto"
+import { Injectable, UnauthorizedException } from "@nestjs/common"
 import { UserService } from "src/user/user.service"
 import { PasswordService } from "./password.service"
-import { SignUpDTO } from "./auth.dto"
+import { SignInDTO, SignUpDTO, TokensDTO } from "./auth.dto"
+import { TokenService } from "./token.service"
 
 @Injectable()
 export class AuthService {
    constructor(
       private userService: UserService,
       private passwordService: PasswordService,
+      private tokenService: TokenService,
    ) {}
 
-   async validateUser(login: string, password: string) {
-      const user = await this.userService.findOneByLogin(login)
-      if (!user) {
-         throw new NotFoundException()
-      }
-
-      const passowrdHash = this.passwordService.hashPassword(password, user.salt)
-
-      if (user.passwordHash !== passowrdHash) {
-         throw new UnauthorizedException()
-      }
-
-      const { passwordHash, salt, ...result } = user
-      return result
-   }
-
-   async registerUser(dto: SignUpDTO) {
+   async registerUser(dto: SignUpDTO): Promise<TokensDTO> {
       const salt = this.passwordService.getSalt()
       const passwordHash = this.passwordService.hashPassword(dto.password, salt)
 
@@ -37,6 +22,42 @@ export class AuthService {
          salt,
       })
 
-      return user
+      const tokens = await this.tokenService.generateJWTTokens(user.id, user.role)
+
+      await this.userService.storeRefreshToken(user.id, tokens.refreshToken)
+
+      return tokens
+   }
+
+   async login(dto: SignInDTO): Promise<TokensDTO> {
+      const user = await this.userService.findOneByLogin(dto.login)
+
+      const providedPasswordHash = this.passwordService.hashPassword(
+         dto.password,
+         user.salt,
+      )
+
+      if (user.passwordHash !== providedPasswordHash) {
+         throw new UnauthorizedException()
+      }
+
+      const tokens = await this.tokenService.generateJWTTokens(user.id, user.role)
+
+      await this.userService.storeRefreshToken(user.id, tokens.refreshToken)
+
+      return tokens
    }
 }
+
+// async validateUserByLogin(login: string, password: string): Promise<GetUserDTO> {
+//    const user = await this.userService.findOneByLogin(login)
+
+//    const providedPasswordHash = this.passwordService.hashPassword(password, user.salt)
+
+//    if (user.passwordHash !== providedPasswordHash) {
+//       throw new UnauthorizedException()
+//    }
+
+//    const { passwordHash, salt, ...result } = user
+//    return result
+// }

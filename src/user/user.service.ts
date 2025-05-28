@@ -24,4 +24,8 @@ export class UserService {
    async create(user: CreateUserDTO) {
       return await this.userRepository.save(user)
    }
+
+   async storeRefreshToken(userId: string, refreshToken: string) {
+      return await this.userRepository.update(userId, { refreshToken })
+   }
 }

@@ -5,11 +5,15 @@ import { ConfigModule } from "@nestjs/config"
 import { ManagerModule } from "./manager/manager.module"
 import { ApplicantModule } from "./applicant/applicant.module"
 import { EmployerModule } from "./employer/employer.module"
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from "./auth/auth.module"
+import { JwtModule } from "@nestjs/jwt"
 
 @Module({
    imports: [
-      ConfigModule.forRoot(),
+      ConfigModule.forRoot({ isGlobal: true }),
+      JwtModule.register({
+         global: true,
+      }),
       TypeOrmModuleConfig,
       UserModule,
       ManagerModule,
