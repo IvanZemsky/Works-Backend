@@ -21,8 +21,22 @@ export class UserService {
       return user
    }
 
+   async findOneById(id: string) {
+      const user = await this.userRepository.findOne({ where: { id } })
+
+      if (!user) {
+         throw new NotFoundException()
+      }
+
+      return user
+   }
+
    async create(user: CreateUserDTO) {
       return await this.userRepository.save(user)
+   }
+
+   async removeRefreshToken(userId: string) {
+      return await this.userRepository.update(userId, { refreshToken: null })
    }
 
    async storeRefreshToken(userId: string, refreshToken: string) {

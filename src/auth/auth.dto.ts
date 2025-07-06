@@ -24,3 +24,9 @@ export type TokensDTO = {
    accessToken: string
    refreshToken: string
 }
+
+export type TokenData = {
+   sub: string
+   role: string
+   type: string
+}

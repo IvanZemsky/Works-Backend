@@ -3,6 +3,7 @@ import { UserService } from "src/user/user.service"
 import { PasswordService } from "./password.service"
 import { SignInDTO, SignUpDTO, TokensDTO } from "./auth.dto"
 import { TokenService } from "./token.service"
+import { CookieService } from "./cookie.service"
 
 @Injectable()
 export class AuthService {
@@ -10,6 +11,7 @@ export class AuthService {
       private userService: UserService,
       private passwordService: PasswordService,
       private tokenService: TokenService,
+      private cookieService: CookieService,
    ) {}
 
    async registerUser(dto: SignUpDTO): Promise<TokensDTO> {
@@ -47,17 +49,31 @@ export class AuthService {
 
       return tokens
    }
+
+   async logout(userId: string) {
+      await this.userService.removeRefreshToken(userId)
+   }
+
+   async refresh(refreshToken: string | null) {
+      if (!refreshToken) {
+         throw new UnauthorizedException()
+      }
+
+      const userData = await this.tokenService.validateRefreshToken(refreshToken)
+      if (!userData) {
+         throw new UnauthorizedException()
+      }
+
+      const user = await this.userService.findOneById(userData.sub)
+
+      // make sure token is in db?
+
+      const tokens = await this.tokenService.generateJWTTokens(
+         user.id,
+         user.role,
+      )
+
+      await this.userService.storeRefreshToken(user.id, tokens.refreshToken)
+      return {...tokens, user}
+   }
 }
-
-// async validateUserByLogin(login: string, password: string): Promise<GetUserDTO> {
-//    const user = await this.userService.findOneByLogin(login)
-
-//    const providedPasswordHash = this.passwordService.hashPassword(password, user.salt)
-
-//    if (user.passwordHash !== providedPasswordHash) {
-//       throw new UnauthorizedException()
-//    }
-
-//    const { passwordHash, salt, ...result } = user
-//    return result
-// }

@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
       private tokenService: TokenService
    ) {}
 
-   canActivate(context: ExecutionContext): boolean {
+   async canActivate(context: ExecutionContext): Promise<boolean> {
       const request = context.switchToHttp().getRequest()
 
       const authHeader = request.headers.authorization as string
@@ -24,7 +24,7 @@ export class AuthGuard implements CanActivate {
          throw new UnauthorizedException()
       }
 
-      const userData = this.tokenService.validateAccessToken(accessToken)
+      const userData = await this.tokenService.validateAccessToken(accessToken)
       if (!userData) {
          throw new UnauthorizedException()
       }
@@ -32,10 +32,5 @@ export class AuthGuard implements CanActivate {
       request.user = userData
 
       return true
-      
-   }
-
-   private extractRefreshTokenFromCookie(request: any): string | undefined {
-      return request.cookies[CookieService.accessTokenKey]
    }
 }

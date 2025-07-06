@@ -14,14 +14,23 @@ export class AuthController {
    @Post("sign-up")
    async signUp(@Res({ passthrough: true }) res: Response, @Body() dto: SignUpDTO) {
       const tokens = await this.authService.registerUser(dto)
-      // пересмотреть
+      // пересмотреть (?)
       this.cookieService.setAccessToken(res, tokens.accessToken)
    }
 
    @Post("sign-in")
    async signIn(@Res({ passthrough: true }) res: Response, @Body() dto: SignInDTO) {
       const tokens = await this.authService.login(dto)
-      // пересмотреть
+      // пересмотреть (?)
       this.cookieService.setAccessToken(res, tokens.accessToken)
+   }
+
+   @Post("sign-out")
+   async logout(
+      @Res({ passthrough: true }) res: Response,
+      @Body() dto: { userId: string },
+   ) {
+      this.cookieService.removeTokensFromCookie(res)
+      this.authService.logout(dto.userId)
    }
 }

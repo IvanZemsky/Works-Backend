@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { AuthConfigService } from "./auth.config"
 import { JWT_TYPES } from "./auth.constants"
-import { TokensDTO } from "./auth.dto"
+import { TokenData, TokensDTO } from "./auth.dto"
 
 @Injectable()
 export class TokenService {
@@ -19,17 +19,16 @@ export class TokenService {
    }
 
    async generateAccessToken(userId: string, role: string) {
-      const payload = { sub: userId, role, type: JWT_TYPES.ACCESS_TOKEN }
+      const payload: TokenData = { sub: userId, role, type: JWT_TYPES.ACCESS_TOKEN }
       const secret = this.authConfigService.config.jwtAccessSecret
       const expiresIn = this.authConfigService.config.jwtAccessExpiresIn
 
       const token = await this.jwtService.signAsync(payload, { secret, expiresIn })
-
       return token
    }
 
    async generateRefreshToken(userId: string, role: string): Promise<string> {
-      const payload = {
+      const payload: TokenData = {
          sub: userId,
          role,
          type: JWT_TYPES.REFRESH_TOKEN,
@@ -48,7 +47,7 @@ export class TokenService {
    async validateAccessToken(token: string) {
       const secret = this.authConfigService.config.jwtAccessSecret
       try {
-         const decoded = await this.jwtService.verifyAsync(token, {
+         const decoded = await this.jwtService.verifyAsync<TokenData>(token, {
             secret,
          })
          return decoded
@@ -60,9 +59,10 @@ export class TokenService {
    async validateRefreshToken(token: string) {
       const secret = this.authConfigService.config.jwtRefreshSecret
       try {
-         const decoded = await this.jwtService.verifyAsync(token, {
+         const decoded = await this.jwtService.verifyAsync<TokenData>(token, {
             secret,
          })
+
          return decoded
       } catch (error) {
          return null
