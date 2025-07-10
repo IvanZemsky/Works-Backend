@@ -3,7 +3,6 @@ import { UserService } from "src/user/user.service"
 import { PasswordService } from "./password.service"
 import { SignInDTO, SignUpDTO, TokensDTO } from "./auth.dto"
 import { TokenService } from "./token.service"
-import { CookieService } from "./cookie.service"
 
 @Injectable()
 export class AuthService {
@@ -11,10 +10,9 @@ export class AuthService {
       private userService: UserService,
       private passwordService: PasswordService,
       private tokenService: TokenService,
-      private cookieService: CookieService,
    ) {}
 
-   async registerUser(dto: SignUpDTO): Promise<TokensDTO> {
+   async registerUser(dto: SignUpDTO): Promise<string> {
       const salt = this.passwordService.getSalt()
       const passwordHash = this.passwordService.hashPassword(dto.password, salt)
 
@@ -28,10 +26,10 @@ export class AuthService {
 
       await this.userService.storeRefreshToken(user.id, tokens.refreshToken)
 
-      return tokens
+      return tokens.accessToken
    }
 
-   async login(dto: SignInDTO): Promise<TokensDTO> {
+   async login(dto: SignInDTO): Promise<string> {
       const user = await this.userService.findOneByLogin(dto.login)
 
       const providedPasswordHash = this.passwordService.hashPassword(
@@ -47,7 +45,7 @@ export class AuthService {
 
       await this.userService.storeRefreshToken(user.id, tokens.refreshToken)
 
-      return tokens
+      return tokens.accessToken
    }
 
    async logout(userId: string) {

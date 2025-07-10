@@ -1,36 +1,48 @@
-import { Body, Controller, Post, Res } from "@nestjs/common"
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common"
 import { AuthService } from "./auth.service"
-import { SignInDTO, SignUpDTO } from "./auth.dto"
+import { SignInDTO, SignUpDTO, TokenData } from "./auth.dto"
 import { CookieService } from "./cookie.service"
 import { Response } from "express"
+import { UserService } from "src/user/user.service"
+import { TokenService } from "./token.service"
+import { AuthGuard } from "./guards/auth.guard"
 
 @Controller("auth")
 export class AuthController {
    constructor(
       private readonly authService: AuthService,
       private readonly cookieService: CookieService,
+      private readonly userService: UserService,
+      private readonly tokenService: TokenService,
    ) {}
 
    @Post("sign-up")
    async signUp(@Res({ passthrough: true }) res: Response, @Body() dto: SignUpDTO) {
-      const tokens = await this.authService.registerUser(dto)
-      // пересмотреть (?)
-      this.cookieService.setAccessToken(res, tokens.accessToken)
+      const accessToken = await this.authService.registerUser(dto)
+      this.cookieService.setAccessToken(res, accessToken)
    }
 
    @Post("sign-in")
+   @HttpCode(HttpStatus.NO_CONTENT)
    async signIn(@Res({ passthrough: true }) res: Response, @Body() dto: SignInDTO) {
-      const tokens = await this.authService.login(dto)
-      // пересмотреть (?)
-      this.cookieService.setAccessToken(res, tokens.accessToken)
+      const accessToken = await this.authService.login(dto)
+      this.cookieService.setAccessToken(res, accessToken)
+   }
+
+   @Get("check-session")
+   async getSessionInfo(@Req() req: Request) {
+      const sessionData: TokenData = req["user"]
+      console.log("SESSION_DATA", sessionData)
+      return sessionData
    }
 
    @Post("sign-out")
+   @HttpCode(HttpStatus.NO_CONTENT)
    async logout(
       @Res({ passthrough: true }) res: Response,
       @Body() dto: { userId: string },
    ) {
-      this.cookieService.removeTokensFromCookie(res)
+      this.cookieService.removeAccessTokenFromCookie(res)
       this.authService.logout(dto.userId)
    }
 }
