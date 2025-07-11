@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common"
+import {
+   Body,
+   Controller,
+   Get,
+   HttpCode,
+   HttpStatus,
+   Post,
+   Req,
+   Res,
+   UseGuards,
+} from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import { SignInDTO, SignUpDTO, TokenData } from "./auth.dto"
 import { CookieService } from "./cookie.service"
@@ -30,19 +40,18 @@ export class AuthController {
    }
 
    @Get("check-session")
+   @UseGuards(AuthGuard)
    async getSessionInfo(@Req() req: Request) {
       const sessionData: TokenData = req["user"]
-      console.log("SESSION_DATA", sessionData)
       return sessionData
    }
 
    @Post("sign-out")
    @HttpCode(HttpStatus.NO_CONTENT)
-   async logout(
-      @Res({ passthrough: true }) res: Response,
-      @Body() dto: { userId: string },
-   ) {
+   @UseGuards(AuthGuard)
+   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+      const sessionData: TokenData = req["user"]
       this.cookieService.removeAccessTokenFromCookie(res)
-      this.authService.logout(dto.userId)
+      this.authService.logout(sessionData.sub)
    }
 }
