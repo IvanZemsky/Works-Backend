@@ -27,6 +27,7 @@ export class AuthController {
    ) {}
 
    @Post("sign-up")
+    @HttpCode(HttpStatus.CREATED)
    async signUp(@Res({ passthrough: true }) res: Response, @Body() dto: SignUpDTO) {
       const accessToken = await this.authService.registerUser(dto)
       this.cookieService.setAccessToken(res, accessToken)

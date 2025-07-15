@@ -8,7 +8,7 @@ export class SignUpDTO {
    @IsNotEmpty()
    password: string
 
-   @IsEnum(["applicant", "manager", "employer"])
+   @IsEnum(["applicant", "employer"])
    role: UserRole
 }
 

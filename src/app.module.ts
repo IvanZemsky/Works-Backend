@@ -7,6 +7,7 @@ import { ApplicantModule } from "./applicant/applicant.module"
 import { EmployerModule } from "./employer/employer.module"
 import { AuthModule } from "./auth/auth.module"
 import { JwtModule } from "@nestjs/jwt"
+import { VacancyModule } from './vacancy/vacancy.module';
 
 @Module({
    imports: [
@@ -20,6 +21,7 @@ import { JwtModule } from "@nestjs/jwt"
       ApplicantModule,
       EmployerModule,
       AuthModule,
+      VacancyModule,
    ],
    controllers: [],
    providers: [],

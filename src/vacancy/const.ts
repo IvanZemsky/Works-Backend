@@ -1,0 +1,1 @@
+export const VACANCY_DEFAULT_LIMIT = 10
