@@ -21,6 +21,6 @@ import { AuthGuard } from "./guards/auth.guard"
       AuthGuard,
    ],
    imports: [forwardRef(() => UserModule)],
-   exports: [AuthGuard, TokenService],
+   exports: [AuthGuard, TokenService, AuthService, CookieService],
 })
 export class AuthModule {}

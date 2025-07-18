@@ -63,8 +63,9 @@ export class AuthService {
       }
 
       const user = await this.userService.findOneById(userData.sub)
-
-      // make sure token is in db?
+      if (!user.refreshToken) {
+         throw new UnauthorizedException()
+      }
 
       const tokens = await this.tokenService.generateJWTTokens(
          user.id,

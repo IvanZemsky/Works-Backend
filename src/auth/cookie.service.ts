@@ -9,13 +9,13 @@ export class CookieService {
 
    constructor(private readonly configService: ConfigService) {}
 
-   setAccessToken(res: Response, accessToken: string): void {
-      res.cookie(CookieService.accessTokenKey, accessToken, {
-         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-         // maxAge: this.getMaxAgeOfAccessToken(), // now working for some reason - only set cookie when expires
+   setAccessToken(res: Response, token: string): void {
+      res.cookie(CookieService.accessTokenKey, token, {
          httpOnly: true,
+         secure: false,
          sameSite: "lax",
-         secure: true,
+         path: "/",
+         maxAge: 24 * 60 * 60 * 1000,
       })
    }
 
@@ -27,6 +27,8 @@ export class CookieService {
    }
 
    removeAccessTokenFromCookie(res: Response): void {
-      res.clearCookie(CookieService.accessTokenKey)
+      res.clearCookie(CookieService.accessTokenKey, {
+         path: "/",
+      })
    }
 }

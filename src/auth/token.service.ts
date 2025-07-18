@@ -68,4 +68,8 @@ export class TokenService {
          return null
       }
    }
+
+   decode(token: string): TokenData | null {
+      return this.jwtService.decode(token) as TokenData | null
+   }
 }

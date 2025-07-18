@@ -16,3 +16,13 @@ export class CreateUserDTO {
    @IsEnum({ values: ["applicant", "manager", "employer"] })
    role: UserRole
 }
+
+export class UpdateUserNameDTO {
+   @IsNotEmpty()
+   firstName: string
+
+   @IsNotEmpty()
+   lastName: string
+
+   patronymic: string | null
+}
