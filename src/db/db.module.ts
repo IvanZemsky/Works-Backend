@@ -16,6 +16,7 @@ const config = parsePgConfig(process.env)
       ...config,
       entities: [User, Employer, Manager, Applicant, Vacancy],
       synchronize: true, // ОСТОРОЖНО: в production использовать миграции!
+      migrations: ['dist/migrations/*.ts'],
     }),
   ],
 })

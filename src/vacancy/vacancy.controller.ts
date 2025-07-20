@@ -13,7 +13,7 @@ import {
    UseGuards,
 } from "@nestjs/common"
 import { VacancyService } from "./vacancy.service"
-import { Vacancy } from "./vacancy.model"
+import { Vacancy, VacancyEducation, VacancyExperience } from "./vacancy.model"
 import { AuthGuard } from "src/auth/guards/auth.guard"
 import { UpdateVacancyDto, CreateVacancyDto } from "./dto/dto"
 import { FindVacanciesFilters } from "./dto/filters"
@@ -33,16 +33,28 @@ export class VacancyController {
    @Get()
    @HttpCode(HttpStatus.OK)
    async find(
+      @Res({ passthrough: true }) res: Response,
       @Query("limit") limit: number = VACANCY_DEFAULT_LIMIT,
       @Query("page") page: number = 1,
       @Query("text_search") textSearch: string = "",
-      @Res({ passthrough: true }) res: Response,
+      @Query("salary_from") salaryFrom: number | null = null,
+      @Query("experience") experience?: VacancyExperience,
+      @Query("education") education?: string,
+      @Query("is_income") isIncome?,
    ): Promise<Vacancy[]> {
       const filters: FindVacanciesFilters = {
          textSearch,
+         salaryFrom,
+         experience,
+         education,
+         isIncome
       }
-      const offset = (limit * page) - limit
-      const {vacancies, count} = await this.vacancyService.findAll(limit, offset, filters)
+      const offset = limit * page - limit
+      const { vacancies, count } = await this.vacancyService.findAll(
+         limit,
+         offset,
+         filters,
+      )
 
       res.set("X-Total-Count", String(count))
       return vacancies

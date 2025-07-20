@@ -7,7 +7,7 @@ import {
    ValidateNested,
 } from "class-validator"
 import { Type } from "class-transformer"
-import { VacancySalaryPeriod, VacancyExperienceType, VacancyStatus, VacancyLocation } from "../vacancy.model"
+import { VacancySalaryPeriod, VacancyStatus, VacancyLocation, VacancyExperience } from "../vacancy.model"
 
 class VacancyAddressDto {
    @IsOptional()
@@ -53,20 +53,6 @@ class VacancyContactsDto {
    @IsOptional()
    @IsString()
    name?: string
-}
-
-class VacancyExperienceDto {
-   @IsOptional()
-   @IsNumber()
-   min?: number
-
-   @IsOptional()
-   @IsNumber()
-   max?: number
-
-   @IsOptional()
-   @IsEnum(VacancyExperienceType)
-   type?: VacancyExperienceType
 }
 
 export class CreateVacancyDto {
@@ -121,13 +107,14 @@ export class CreateVacancyDto {
 
    @IsNotEmpty()
    @ValidateNested()
-   @Type(() => VacancyExperienceDto)
-   experience: VacancyExperienceDto
+   experience: VacancyExperience
 
    @IsNotEmpty()
    @ValidateNested()
    @Type(() => VacancyContactsDto)
    contacts: VacancyContactsDto
+
+
 }
 
 export class UpdateVacancyDto {
@@ -182,8 +169,7 @@ export class UpdateVacancyDto {
 
    @IsOptional()
    @ValidateNested()
-   @Type(() => VacancyExperienceDto)
-   experience?: VacancyExperienceDto
+   experience?: VacancyExperience
 
    @IsOptional()
    @ValidateNested()

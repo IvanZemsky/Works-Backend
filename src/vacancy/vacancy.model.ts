@@ -1,6 +1,13 @@
 import { Employer } from "src/employer/emloyer.model"
 import { User } from "src/user/user.model"
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import {
+   Column,
+   Entity,
+   JoinColumn,
+   ManyToOne,
+   OneToOne,
+   PrimaryGeneratedColumn,
+} from "typeorm"
 
 class VacancyAddress {
    @Column({ type: "text", nullable: true })
@@ -38,17 +45,6 @@ class VacancyContacts {
    name: string | null
 }
 
-class VacancyExperience {
-   @Column({ nullable: true })
-   min: number
-
-   @Column({ nullable: true })
-   max: number
-
-   @Column({ nullable: true })
-   type: VacancyExperienceType
-}
-
 @Entity({ name: "vacancies" })
 export class Vacancy {
    @PrimaryGeneratedColumn("uuid")
@@ -57,7 +53,7 @@ export class Vacancy {
    @ManyToOne(() => Employer, (employer) => employer.id)
    @JoinColumn()
    employer: Employer
-   
+
    @ManyToOne(() => User, (user) => user.id)
    @JoinColumn()
    user: User
@@ -92,11 +88,14 @@ export class Vacancy {
    @Column({ type: "text", nullable: true })
    skills: string | null
 
-   @Column(() => VacancyExperience)
+   @Column({ type: "enum", enum: ["none", "1-3", "3-6", "6+"], default: "none" })
    experience: VacancyExperience
 
    @Column(() => VacancyContacts)
    contacts: VacancyContacts
+
+   @Column({ type: "enum", enum: ["none", "secondary", "high"], default: "none" })
+   education: VacancyEducation
 }
 
 export enum VacancyLocation {
@@ -115,10 +114,7 @@ export enum VacancySalaryPeriod {
    MONTH = "month",
 }
 
-export enum VacancyExperienceType {
-   YEARS = "years",
-   MONTHS = "months",
-}
+export type VacancyExperience = "none" | "1-3" | "3-6" | "6+"
 
 export type VacancyApplicationStatus =
    | "applied"
@@ -127,3 +123,5 @@ export type VacancyApplicationStatus =
    | "archived"
    | "company_blocked"
    | "employer_blocked"
+
+export type VacancyEducation = "none" | "secondary" | "high"

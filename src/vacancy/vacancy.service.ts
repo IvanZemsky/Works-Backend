@@ -1,8 +1,18 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, Like, FindOptionsWhere, Raw } from "typeorm"
+import {
+   Repository,
+   Like,
+   FindOptionsWhere,
+   Raw,
+   Not,
+   IsNull,
+   MoreThan,
+   MoreThanOrEqual,
+   In,
+} from "typeorm"
 import { UpdateVacancyDto, CreateVacancyDto } from "./dto/dto"
-import { Vacancy } from "./vacancy.model"
+import { Vacancy, VacancyEducation } from "./vacancy.model"
 import { Employer } from "src/employer/emloyer.model"
 import { User } from "src/user/user.model"
 import { FindVacanciesFilters } from "./dto/filters"
@@ -48,18 +58,25 @@ export class VacancyService {
       filters: FindVacanciesFilters,
    ): Promise<{ vacancies: Vacancy[]; count: number }> {
       try {
-         const where: FindOptionsWhere<Vacancy>[] = []
+         const where: FindOptionsWhere<Vacancy> = {}
 
-         if (filters.textSearch) {
-            where.push({
-               title: Raw((alias) => `${alias} ILIKE '%${filters.textSearch}%'`),
-            })
-            where.push({
-               description: Raw((alias) => `${alias} ILIKE '%${filters.textSearch}%'`),
-            })
-            where.push({
-               skills: Raw((alias) => `${alias} ILIKE '%${filters.textSearch}%'`),
-            })
+         where.title = Raw((alias) => `${alias} ILIKE '%${filters.textSearch}%'`)
+         where.description = Raw((alias) => `${alias} ILIKE '%${filters.textSearch}%'`)
+         where.skills = Raw((alias) => `${alias} ILIKE '%${filters.textSearch}%'`)
+         if (filters.salaryFrom) {
+            where.salary = {
+               min: MoreThanOrEqual(filters.salaryFrom),
+            }
+         }
+         if (filters.isIncome && !filters.salaryFrom) {
+            where.salary = [{ min: Not(IsNull()) }, { max: Not(IsNull()) }]
+         }
+         if (filters.experience) {
+            where.experience = filters.experience
+         }
+         if (filters.education) {
+            const parsed = filters.education.split(",") as VacancyEducation[]
+            where.education = In(parsed)
          }
 
          const [vacancies, count] = await this.vacancyRepository.findAndCount({
